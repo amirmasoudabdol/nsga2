@@ -88,7 +88,9 @@ extern population *child_pop;
 extern population *mixed_pop;
 
 
-
+/**
+ *  allocate.c
+ */
 void allocate_memory_pop (NSGA2Type *nsga2Params,  population *pop, int size);
 void allocate_memory_ind (NSGA2Type *nsga2Params, individual *ind);
 void deallocate_memory_pop (NSGA2Type *nsga2Params, population *pop, int size);
@@ -112,8 +114,8 @@ void onthefly_display (NSGA2Type *nsga2Params, population *pop, FILE *gp, int ii
 
 int check_dominance (NSGA2Type *nsga2Params, individual *a, individual *b);
 
-void evaluate_pop (NSGA2Type *nsga2Params, population *pop);
-void evaluate_ind (NSGA2Type *nsga2Params, individual *ind);
+void evaluate_pop (NSGA2Type *nsga2Params, population *pop, void *, void *);
+void evaluate_ind (NSGA2Type *nsga2Params, individual *ind, void *, void *);
 
 
 void fill_nondominated_sort (NSGA2Type *nsga2Params,  population *mixed_pop, population *new_pop);
@@ -149,9 +151,12 @@ void q_sort_dist(population *pop, int *dist, int left, int right);
 void selection (NSGA2Type *nsga2Params, population *old_pop, population *new_pop);
 individual* tournament (NSGA2Type *nsga2Params, individual *ind1, individual *ind2);
 
+/**
+ * nsga2.c
+ */
 NSGA2Type ReadParameters(int argc, char **argv);
-void InitNSGA2(NSGA2Type *nsga2Params);
-int NSGA2(NSGA2Type *nsga2Params);
+void InitNSGA2(NSGA2Type *nsga2Params, void *, void *);
+int NSGA2(NSGA2Type *nsga2Params, void *, void *);
 void print_nsga2Params(NSGA2Type *nsga2Params);
 
 # endif
