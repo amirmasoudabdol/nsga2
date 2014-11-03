@@ -17,7 +17,7 @@ population *mixed_pop;
 NSGA2Type ReadParameters(int argc, char **argv){
     int i;
     NSGA2Type nsga2Params;
-
+    
     if (argc<2)
     {
         printf("\n Usage ./nsga2r random_seed \n");
@@ -29,16 +29,6 @@ NSGA2Type ReadParameters(int argc, char **argv){
         printf("\n Entered seed value is wrong, seed value must be in (0,1) \n");
         exit(1);
     }
-    fpt1 = fopen("initial_pop.out","w");
-    fpt2 = fopen("final_pop.out","w");
-    fpt3 = fopen("best_pop.out","w");
-    fpt4 = fopen("all_pop.out","w");
-    fpt5 = fopen("params.out","w");
-    fprintf(fpt1,"# This file contains the data of initial population\n");
-    fprintf(fpt2,"# This file contains the data of final population\n");
-    fprintf(fpt3,"# This file contains the data of final feasible population (if found)\n");
-    fprintf(fpt4,"# This file contains the data of all generations\n");
-    fprintf(fpt5,"# This file contains information about inputs as read by the program\n");
     printf("\n Enter the problem relevant and algorithm relevant parameters ... ");
     printf("\n Enter the population size (a multiple of 4) : ");
     scanf("%d",&nsga2Params.popsize);
@@ -286,79 +276,7 @@ NSGA2Type ReadParameters(int argc, char **argv){
             }
         }
     }
-    printf("\n Input data successfully entered, now performing initialization \n");
-    fprintf(fpt5,"\n Population size = %d",nsga2Params.popsize);
-    fprintf(fpt5,"\n Number of generations = %d",nsga2Params.ngen);
-    fprintf(fpt5,"\n Number of objective functions = %d",nsga2Params.nobj);
-    fprintf(fpt5,"\n Number of constraints = %d",nsga2Params.ncon);
-    fprintf(fpt5,"\n Number of real variables = %d",nsga2Params.nreal);
-    if (nsga2Params.nreal!=0)
-    {
-        for (i=0; i<nsga2Params.nreal; i++)
-        {
-            fprintf(fpt5,"\n Lower limit of real variable %d = %e",i+1,nsga2Params.min_realvar[i]);
-            fprintf(fpt5,"\n Upper limit of real variable %d = %e",i+1,nsga2Params.max_realvar[i]);
-        }
-        fprintf(fpt5,"\n Probability of crossover of real variable = %e",nsga2Params.pcross_real);
-        fprintf(fpt5,"\n Probability of mutation of real variable = %e",nsga2Params.pmut_real);
-        fprintf(fpt5,"\n Distribution index for crossover = %e",nsga2Params.eta_c);
-        fprintf(fpt5,"\n Distribution index for mutation = %e",nsga2Params.eta_m);
-    }
-    fprintf(fpt5,"\n Number of binary variables = %d",nsga2Params.nbin);
-    if (nsga2Params.nbin!=0)
-    {
-        for (i=0; i<nsga2Params.nbin; i++)
-        {
-            fprintf(fpt5,"\n Number of bits for binary variable %d = %d",i+1,nsga2Params.nbits[i]);
-            fprintf(fpt5,"\n Lower limit of binary variable %d = %e",i+1,nsga2Params.min_binvar[i]);
-            fprintf(fpt5,"\n Upper limit of binary variable %d = %e",i+1,nsga2Params.max_binvar[i]);
-        }
-        fprintf(fpt5,"\n Probability of crossover of binary variable = %e",nsga2Params.pcross_bin);
-        fprintf(fpt5,"\n Probability of mutation of binary variable = %e",nsga2Params.pmut_bin);
-    }
-    fprintf(fpt5,"\n Seed for random number generator = %e",nsga2Params.seed);
-    nsga2Params.bitlength = 0;
-    if (nsga2Params.nbin!=0)
-    {
-        for (i=0; i<nsga2Params.nbin; i++)
-        {
-            nsga2Params.bitlength += nsga2Params.nbits[i];
-        }
-    }
-    fprintf(fpt1,"# of objectives = %d, # of constraints = %d, # of real_var = %d, # of bits of bin_var = %d, constr_violation, rank, crowding_distance\n",nsga2Params.nobj,nsga2Params.ncon,nsga2Params.nreal,nsga2Params.bitlength);
-    fprintf(fpt2,"# of objectives = %d, # of constraints = %d, # of real_var = %d, # of bits of bin_var = %d, constr_violation, rank, crowding_distance\n",nsga2Params.nobj,nsga2Params.ncon,nsga2Params.nreal,nsga2Params.bitlength);
-    fprintf(fpt3,"# of objectives = %d, # of constraints = %d, # of real_var = %d, # of bits of bin_var = %d, constr_violation, rank, crowding_distance\n",nsga2Params.nobj,nsga2Params.ncon,nsga2Params.nreal,nsga2Params.bitlength);
-    fprintf(fpt4,"# of objectives = %d, # of constraints = %d, # of real_var = %d, # of bits of bin_var = %d, constr_violation, rank, crowding_distance\n",nsga2Params.nobj,nsga2Params.ncon,nsga2Params.nreal,nsga2Params.bitlength);
-    nsga2Params.nbinmut = 0;
-    nsga2Params.nrealmut = 0;
-    nsga2Params.nbincross = 0;
-    nsga2Params.nrealcross = 0;
-    parent_pop = (population *)malloc(sizeof(population));
-    child_pop = (population *)malloc(sizeof(population));
-    mixed_pop = (population *)malloc(sizeof(population));
-    allocate_memory_pop (&nsga2Params, parent_pop, nsga2Params.popsize);
-    allocate_memory_pop (&nsga2Params, child_pop, nsga2Params.popsize);
-    allocate_memory_pop (&nsga2Params, mixed_pop, 2*nsga2Params.popsize);
-    randomize(nsga2Params.seed);
-    initialize_pop (&nsga2Params, parent_pop);
-    printf("\n Initialization done, now performing first generation");
-    decode_pop(&nsga2Params, parent_pop);
-    evaluate_pop (&nsga2Params, parent_pop);
-    assign_rank_and_crowding_distance (&nsga2Params, parent_pop);
-    report_pop (&nsga2Params, parent_pop, fpt1);
-    fprintf(fpt4,"# gen = 1\n");
-    report_pop(&nsga2Params, parent_pop,fpt4);
-    printf("\n gen = 1");
-    fflush(stdout);
-    if (nsga2Params.choice!=0)    onthefly_display (&nsga2Params, parent_pop,gp,1);
-    fflush(fpt1);
-    fflush(fpt2);
-    fflush(fpt3);
-    fflush(fpt4);
-    fflush(fpt5);
-    sleep(1);
-
-	return nsga2Params;
+    return nsga2Params;
 }
 
 
@@ -366,11 +284,10 @@ NSGA2Type ReadParameters(int argc, char **argv){
 void InitNSGA2(NSGA2Type *nsga2Params)
 {
     int i;
-
-    printf("InitNSGA2\n");
     
-    // seed = nsga2Params->seed;     //TODO: HardCoded!
-
+    printf("\n == InitNSGA2 ==");
+    
+    // Initialize the files...
     fpt1 = fopen("initial_pop.out","w");
     fpt2 = fopen("final_pop.out","w");
     fpt3 = fopen("best_pop.out","w");
@@ -381,14 +298,7 @@ void InitNSGA2(NSGA2Type *nsga2Params)
     fprintf(fpt3,"# This file contains the data of final feasible population (if found)\n");
     fprintf(fpt4,"# This file contains the data of all generations\n");
     fprintf(fpt5,"# This file contains information about inputs as read by the program\n");
-
-    printf("\n Enter the problem relevant and algorithm relevant parameters ... ");
-    printf("\n Enter the population size (a multiple of 4) : ");
-
-    // print_nsga2Params(nsga2Params);
- 
-
-    printf("\n Input data successfully entered, now performing initialization \n");
+    
     fprintf(fpt5,"\n Population size = %d",nsga2Params->popsize);
     fprintf(fpt5,"\n Number of generations = %d",nsga2Params->ngen);
     fprintf(fpt5,"\n Number of objective functions = %d",nsga2Params->nobj);
@@ -435,13 +345,16 @@ void InitNSGA2(NSGA2Type *nsga2Params)
     nsga2Params->nrealmut = 0;
     nsga2Params->nbincross = 0;
     nsga2Params->nrealcross = 0;
+    
+    // Initializing the populations
     parent_pop = (population *)malloc(sizeof(population));
     child_pop = (population *)malloc(sizeof(population));
     mixed_pop = (population *)malloc(sizeof(population));
     allocate_memory_pop (nsga2Params, parent_pop, nsga2Params->popsize);
     allocate_memory_pop (nsga2Params, child_pop, nsga2Params->popsize);
     allocate_memory_pop (nsga2Params, mixed_pop, 2*nsga2Params->popsize);
-
+    
+    // Preparing first Population
     randomize(nsga2Params->seed);
     initialize_pop (nsga2Params,  parent_pop);
     printf("\n Initialization done, now performing first generation");
@@ -451,7 +364,8 @@ void InitNSGA2(NSGA2Type *nsga2Params)
     report_pop (nsga2Params, parent_pop, fpt1);
     fprintf(fpt4,"# gen = 1\n");
     report_pop(nsga2Params, parent_pop,fpt4);
-    printf("\n gen = 1");
+    printf("\n -- Generation -- 1");
+    
     fflush(stdout);
     if (nsga2Params->choice!=0)    onthefly_display (nsga2Params, parent_pop,gp,1);
     fflush(fpt1);
@@ -459,7 +373,6 @@ void InitNSGA2(NSGA2Type *nsga2Params)
     fflush(fpt3);
     fflush(fpt4);
     fflush(fpt5);
-    sleep(1);
 }
 
 
@@ -468,7 +381,7 @@ void InitNSGA2(NSGA2Type *nsga2Params)
 int NSGA2(NSGA2Type *nsga2Params)
 {
     int i;
-
+    
     for (i=2; i<=nsga2Params->ngen; i++)
     {
         selection (nsga2Params,  parent_pop, child_pop);
@@ -478,18 +391,18 @@ int NSGA2(NSGA2Type *nsga2Params)
         merge (nsga2Params,  parent_pop, child_pop, mixed_pop);
         fill_nondominated_sort (nsga2Params,  mixed_pop, parent_pop);
         /* Comment following four lines if information for all
-        generations is not desired, it will speed up the execution */
+         generations is not desired, it will speed up the execution */
         fprintf(fpt4,"# gen = %d\n",i);
         report_pop(nsga2Params, parent_pop,fpt4);
         fflush(fpt4);
         if (nsga2Params->choice!=0)    onthefly_display (nsga2Params, parent_pop,gp,i);
-        printf("\n gen = %d",i);
+        printf("\n -- Generation %d --", i);
     }
     printf("\n Generations finished, now reporting solutions");
-
+    
     report_pop(nsga2Params,  parent_pop,fpt2);
     report_feasible(nsga2Params,  parent_pop,fpt3);
-
+    
     if (nsga2Params->nreal!=0)
     {
         fprintf(fpt5,"\n Number of crossover of real variable = %d",nsga2Params->nrealcross);
@@ -500,7 +413,8 @@ int NSGA2(NSGA2Type *nsga2Params)
         fprintf(fpt5,"\n Number of crossover of binary variable = %d",nsga2Params->nbincross);
         fprintf(fpt5,"\n Number of mutation of binary variable = %d",nsga2Params->nbinmut);
     }
-
+    
+    // Closing the files and freeing up memories...
     fflush(stdout);
     fflush(fpt1);
     fflush(fpt2);
@@ -540,7 +454,7 @@ int NSGA2(NSGA2Type *nsga2Params)
 
 void print_nsga2Params(NSGA2Type *nsga2Params){
     int i;
-
+    
     printf("NSGA2 Parameters:\n");
     printf("\n seed number is : %lf", nsga2Params->seed);
     printf("\n population size read is : %d",nsga2Params->popsize);
@@ -550,8 +464,8 @@ void print_nsga2Params(NSGA2Type *nsga2Params){
     printf("\n number of real variables entered is : %d",nsga2Params->nreal);
     printf("\n variables bounds: ");
     for (i=0; i<nsga2Params->nreal; i++){
-            printf("[%lf", nsga2Params->min_realvar[i]);
-            printf(" %lf], ", nsga2Params->max_realvar[i]);
+        printf("[%lf", nsga2Params->min_realvar[i]);
+        printf(" %lf], ", nsga2Params->max_realvar[i]);
     }
     printf("\n Probability of crossover entered is : %e",nsga2Params->pcross_real);
     printf("\n Probability of mutation entered is : %e",nsga2Params->pmut_real);

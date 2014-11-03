@@ -17,6 +17,9 @@
 *.out
 *.app
 
+# Binaries
+nsga2r
+
 # Sublime-text
 *.sublime-workspace
 *.sublime-project
